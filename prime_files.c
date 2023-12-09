@@ -213,7 +213,7 @@ static void init_file(file_handler fh, int n) {
 	//len /= 8; //bytes...
 	//len /= WORDSIZE; //write by WORDSIZE...
 	int len = pow(2, n-2 - 2);
-	len = max(len, 4);
+	len = fmax(len, 4);
 
 	//need 2**7 entries, that is, 2 ** 7 * 2 bits, that is, 2^8 bits.
 	if (n == 7) {
