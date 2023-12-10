@@ -18,11 +18,11 @@
 #endif
 
 #define MAX_WORKING_BIT 31
-#define WORKINGFILE_EXT "bin"
-#define OUTFILE_EXT "primes"
+#define WORKINGFILE_EXT "bin" //File that is written
+#define OUTFILE_EXT "primes" //File whose domain numbers are all calculated
 #define OUTDIR "outfiles/"
 #define FILENAME_BUFSIZE 64
-#define WORDSIZE (sizeof (int))
+#define WORDSIZE (sizeof (int)) //4. TODO: just replace this with 4.
 
 typedef int file_handler;
 static file_handler fh_g = 0;
@@ -39,7 +39,7 @@ static int get_current_working_bit(void);
 static bool file_exists(const char *path);
 static file_handler open_file(const char *path);
 static void close_file(file_handler fh);
-static void init_file(file_handler fh, int n);
+static void init_file(file_handler fh, int n); //n: working bit
 static primenum_t next_empty(void);
 static void increment_working_number(void);
 
@@ -52,8 +52,8 @@ void startup(void) {
 	if (!file_exists(OUTDIR))
 		mkdir(OUTDIR, 0777);
 
-	bool should_check = (current_working_bit == 7);
-	PRINTLOG("working bit is 7.\n");
+	//bool should_check = (current_working_bit == 7);
+	//PRINTLOG("working bit is 7.\n");
 
 	//Get the current working bit
 	int n = get_current_working_bit();
@@ -88,24 +88,23 @@ void set_one(primenum_t target, bool is_prime) {
 	
 	PRINTLOG("set_one, %lld\n", target);
 
-	target -= pow(2, current_working_bit);
-	int loc = target / 4;
+	target -= pow(2, current_working_bit); //Remove the 2**w_b
+	int loc = target / 4; //4 entries per a number (takes 2 bits)
 
 	PRINTLOG("set_one2, %lld\n", target);
-
 	PRINTLOG("loc: %d\n", loc);
 
 	lseek(fh, loc, SEEK_SET);
-	read(fh, &c, 1);
+	read(fh, &c, 1); //00 00 00 00, which contains 4 entries, one of which is in `enum Numstat`
 
 	PRINTLOG("original c: %#x\n", c);
 
 	enum Numstat stat = (is_prime) ? PRIME : NOTPRIME;
-	c |= (stat) << ((3 - target % 4) * 2);
+	c |= (stat) << ((3 - target % 4) * 2); //Get the entry. The first one should be shifted by 3*2 bits to be placed in the first two bits.
 
 	PRINTLOG("new c: %#x\n", c);
 	
-	lseek(fh, loc, SEEK_SET);
+	lseek(fh, loc, SEEK_SET); //Write one the same location.
 	if (write(fh, &c, 1) == -1)
 		perror("write");
 }
@@ -155,7 +154,7 @@ enum Numstat check_num(primenum_t target) {
 	read(fd, &c, 1);
 
 	c >>= ((3 - target % 4) * 2);
-	c &= 0x3;
+	c &= 0x3; // & 0b11, effectively getting the last 2 bits (that fits `enum Numstat`)
 	
 	if (should_close_fd)
 		close_file(fd);
@@ -216,10 +215,10 @@ static void init_file(file_handler fh, int n) {
 	len = fmax(len, 4);
 
 	//need 2**7 entries, that is, 2 ** 7 * 2 bits, that is, 2^8 bits.
-	if (n == 7) {
+	/*if (n == 7) {
 		PRINTLOG("n == 7.\n");
 		PRINTLOG("writing %ld bytes.\n", len * WORDSIZE);
-	}
+	}*/
 
 	PRINTLOG("Init. file\n");
 	for (int i = 0; i < len; i++) {
@@ -230,7 +229,7 @@ static void init_file(file_handler fh, int n) {
 
 static primenum_t next_empty(void) {
 	primenum_t len = pow(2, current_working_bit);
-	void *buf = calloc(1, 1);
+	void *buf = calloc(1, 1); //TODO: Why not just (int *)?
 	primenum_t res = 0;
 	bool got_one = false;
 
@@ -245,11 +244,11 @@ static primenum_t next_empty(void) {
 			PRINTLOG("%lld, %lld\n", i, len);
 
 			int roi = *((int *) buf);
-			roi >>= (3 - j) * 2;
+			roi >>= (3 - j) * 2; //00 00 00 00, from the left.
 
 			PRINTLOG("roi: %#x\n", roi);
 
-			roi &= 0x3;
+			roi &= 0x3; //Get the last 2 bits
 
 			PRINTLOG("roi: %#x\n", roi);
 
