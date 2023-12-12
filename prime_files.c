@@ -75,6 +75,7 @@ void startup(void) {
 }
 
 void cleanup(void) {
+	puts("Cleaning up.");
 	close_file(fh_g);
 }
 
