@@ -4,9 +4,6 @@
 #include <stdbool.h>
 #include "prime_common.h"
 
-//EMPTY: "not set, unknown", ALLOC: "allocated by other process, or unavailable"
-enum Numstat { EMPTY = 00, PRIME = 01, NOTPRIME = 02, ALLOC = 03 };
-
 //Needed by the server.
 void startup(void);
 void cleanup(void);

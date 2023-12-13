@@ -22,7 +22,9 @@ int main(void) {
 	int msgid;
 
 	int len;
-	signal(SIGINT, signal_handler);
+  
+  signal(SIGINT, signal_handler);
+
 	key = ftok(KEYPATH, PROJID);
 	if ((msgid = msgget(key, IPC_CREAT | 0644)) < 0) {
 		perror("msgget");
