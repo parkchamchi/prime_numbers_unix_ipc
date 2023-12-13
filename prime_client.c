@@ -19,14 +19,14 @@ int main(void) {
 	}
 
 	struct primemsgbuf outmsg = { MTYP_REQ, CMD_CHECK_NUM, {10, 11, 12} };
-	if (msgsnd(msgid, (void *) &outmsg, sizeof (outmsg), IPC_NOWAIT) == -1) { //TODO: make a wrapper of this
+	if (msgsnd(msgid, (void *) &outmsg, PBUFSIZE, IPC_NOWAIT) == -1) { //TODO: make a wrapper of this
 		perror("msgsnd");
 		exit(1);
 	}
 
 	//RECV
 	struct primemsgbuf inmsg = { 0 };
-	int len = msgrcv(msgid, &inmsg, sizeof (inmsg), 0, 0); //msgtype, msgflag
+	int len = msgrcv(msgid, &inmsg, PBUFSIZE, 0, 0); //msgtype, msgflag
 	printf("res: %0#llx\n", inmsg.args[0]);
 
 	return 0;

@@ -16,7 +16,7 @@ int main(void) {
 	int len;
 
 	key = ftok(KEYPATH, PROJID);
-	if ((msgid = msgget(key, 0)) < 0) {
+	if ((msgid = msgget(key, IPC_CREAT | 0644)) < 0) {
 		perror("msgget");
 		exit(1);
 	}
@@ -25,7 +25,7 @@ int main(void) {
 
 	/* LOOP */
 	while (1) {
-		len = msgrcv(msgid, &inmsg, sizeof (inmsg), 0, 0); //msgtype, msgflag
+		len = msgrcv(msgid, &inmsg, PBUFSIZE, 0, 0); //msgtype, msgflag
 
 		for (int i = 0; i < ARGSIZE; i++)
 			printf("%lld ", inmsg.args[i]);
@@ -37,7 +37,7 @@ int main(void) {
 
 			//ret.
 			struct primemsgbuf outmsg = { MTYP_RES, inmsg.cmd, { res } };
-			if (msgsnd(msgid, (void *) &outmsg, sizeof (outmsg), IPC_NOWAIT) == -1) {
+			if (msgsnd(msgid, (void *) &outmsg, PBUFSIZE, IPC_NOWAIT) == -1) {
 				perror("msgsnd");
 				exit(1);
 			}
