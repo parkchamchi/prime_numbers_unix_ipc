@@ -1,0 +1,11 @@
+@startuml
+!includesub style.puml!STYLE
+
+mainframe **prime_c_checknum**
+
+!includesub style.puml!PARTICIPANTS
+
+Client -> Server : check_num(n)
+Server --> Client : Returns result
+
+@enduml

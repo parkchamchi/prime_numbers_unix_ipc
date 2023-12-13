@@ -1,0 +1,17 @@
+@startuml
+!includesub style.puml!STYLE
+
+mainframe **prime_c_loop**
+
+!includesub style.puml!PARTICIPANTS
+
+Client -> Server : alloc_one()
+Server --> Client : Returns n
+
+Client -> Client : result <- is_prime(n)
+deactivate Client
+deactivate Client
+
+Client -> Server : set_one(n, result')
+
+@enduml

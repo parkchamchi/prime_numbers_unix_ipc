@@ -1,0 +1,21 @@
+@startuml
+
+!startsub STYLE
+
+skinparam dpi 200
+skinparam style strictuml
+
+hide footbox
+
+autoactivate on
+
+!endsub
+
+!startsub PARTICIPANTS
+
+participant Client
+participant Server
+
+!endsub
+
+@enduml

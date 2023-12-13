@@ -35,6 +35,8 @@
 
 #### 수 할당 및 계산 (1, 2)
 
+![loopuml](./images/loop.png)
+
 코드: [`prime_c_loop.c`](./prime_c_loop.c)
 
 이 클라이언트는 무한루프를 돌며
@@ -44,6 +46,8 @@
 3. 다시 서버에게 통보한다.
 
 #### 수에 대한 정보 확인 (3)
+
+![checknumuml](./images/checknum.png)
 
 코드: [`prime_c_checknum.c`](./prime_c_checknum.c)
 
