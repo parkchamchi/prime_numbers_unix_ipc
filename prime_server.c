@@ -25,26 +25,27 @@ int main(void) {
 
 	/* LOOP */
 	while (1) {
-		len = msgrcv(msgid, &inmsg, PBUFSIZE, 0, 0); //msgtype, msgflag
+		len = msgrcv(msgid, &inmsg, PBUFSIZE, MTYP_REQ, 0); //msgtype, msgflag
 
 		for (int i = 0; i < ARGSIZE; i++)
 			printf("%lld ", inmsg.args[i]);
 		
-		struct primemsgbuf outmsg = { MTYP_RES, inmsg.cmd, { 0 } };
-		primenum_t res = 0;
+		struct primemsgbuf outmsg = { 0, inmsg.cmd, { 0 } };
 		bool should_reply = false;
 
 		switch (inmsg.cmd) {
 		case CMD_CHECK_NUM:
 			puts("CHECK_NUM");
-			res = check_num(inmsg.args[0]);
+			outmsg.mtype = MTYP_RES_CHECK_NUM;
+			outmsg.args[0] = check_num(inmsg.args[0]);
 			should_reply = true;
 
 			break;
 
 		case CMD_ALLOC_ONE:
 			puts("ALLOC_ONE");
-			res = alloc_one();
+			outmsg.mtype = MTYP_RES_ALLOC_ONE;
+			outmsg.args[0] = alloc_one();
 			should_reply = true;
 		
 			break; 
@@ -63,7 +64,6 @@ int main(void) {
 
 		//ret.
 		if (should_reply) {
-			outmsg.args[0] = res;
 
 			if (msgsnd(msgid, (void *) &outmsg, PBUFSIZE, IPC_NOWAIT) == -1) {
 				perror("msgsnd");

@@ -41,7 +41,6 @@ static file_handler open_file(const char *path);
 static void close_file(file_handler fh);
 static void init_file(file_handler fh, int n); //n: working bit
 static primenum_t next_empty(void);
-static void set_one_numstat(primenum_t target, enum Numstat stat);
 static void increment_working_number(void);
 
 static int dummyprintf(const char *, ...);
@@ -82,14 +81,37 @@ void cleanup(void) {
 
 primenum_t alloc_one(void) {
 	primenum_t n = next_empty();
-	set_one_numstat(n, ALLOC);
+	set_one(n, ALLOC);
 
 	return n;
 }
 
-void set_one(primenum_t target, bool is_prime) {
-	enum Numstat stat = (is_prime) ? PRIME : NOTPRIME;
-	set_one_numstat(target, stat);
+void set_one(primenum_t target, enum Numstat stat) {
+	printf("target %lld, stat %#x\n", target, stat);
+
+	file_handler fh = fh_g;
+	char c = 0;
+	
+	PRINTLOG("set_one, %lld\n", target);
+
+	target -= pow(2, current_working_bit); //Remove the 2**w_b
+	int loc = target / 4; //4 entries per a number (takes 2 bits)
+
+	PRINTLOG("set_one2, %lld\n", target);
+	PRINTLOG("loc: %d\n", loc);
+
+	lseek(fh, loc, SEEK_SET);
+	read(fh, &c, 1); //00 00 00 00, which contains 4 entries, one of which is in `enum Numstat`
+
+	PRINTLOG("original c: %#x\n", c);
+
+	c |= (stat) << ((3 - target % 4) * 2); //Get the entry. The first one should be shifted by 3*2 bits to be placed in the first two bits.
+
+	PRINTLOG("new c: %#x\n", c);
+	
+	lseek(fh, loc, SEEK_SET); //Write one the same location.
+	if (write(fh, &c, 1) == -1)
+		perror("write");
 }
 
 enum Numstat check_num(primenum_t target) {
@@ -257,32 +279,6 @@ static primenum_t next_empty(void) {
 		PRINTLOG("ret. %lld + %lld = %lld\n", len, res, len + res);
 		return len + res;		
 	}
-}
-
-static void set_one_numstat(primenum_t target, enum Numstat stat) {
-	file_handler fh = fh_g;
-	char c = 0;
-	
-	PRINTLOG("set_one, %lld\n", target);
-
-	target -= pow(2, current_working_bit); //Remove the 2**w_b
-	int loc = target / 4; //4 entries per a number (takes 2 bits)
-
-	PRINTLOG("set_one2, %lld\n", target);
-	PRINTLOG("loc: %d\n", loc);
-
-	lseek(fh, loc, SEEK_SET);
-	read(fh, &c, 1); //00 00 00 00, which contains 4 entries, one of which is in `enum Numstat`
-
-	PRINTLOG("original c: %#x\n", c);
-
-	c |= (stat) << ((3 - target % 4) * 2); //Get the entry. The first one should be shifted by 3*2 bits to be placed in the first two bits.
-
-	PRINTLOG("new c: %#x\n", c);
-	
-	lseek(fh, loc, SEEK_SET); //Write one the same location.
-	if (write(fh, &c, 1) == -1)
-		perror("write");
 }
 
 static void increment_working_number(void) {

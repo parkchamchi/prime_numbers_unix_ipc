@@ -15,7 +15,7 @@ int main(void) {
 		if (res)
 			printf("*******next: %lld: %s\n", next, (res) ? "yes" : "no");
 
-		set_one(next, res);
+		set_one(next, (res) ? PRIME : NOTPRIME);
 	}
 
 	cleanup();

@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
 	//RECV
 	struct primemsgbuf inmsg = { 0 };
-	int len = msgrcv(msgid, &inmsg, PBUFSIZE, 0, 0); //msgtype, msgflag
+	int len = msgrcv(msgid, &inmsg, PBUFSIZE, MTYP_RES_CHECK_NUM, 0); //msgtype, msgflag
 
 	enum Numstat res = (enum Numstat) inmsg.args[0];
 	printf("res: %0#x\n", res);
