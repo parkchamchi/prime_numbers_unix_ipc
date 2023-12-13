@@ -29,6 +29,9 @@ int main(int argc, char *argv[]) {
 
 	int i = 0;
 	while (1) {
+		if (!infloop && i >= looplim)
+			break;
+
 		//Alloc one
 		struct primemsgbuf outmsg = { MTYP_REQ, CMD_ALLOC_ONE, { 0 } };
 		if (msgsnd(msgid, (void *) &outmsg, PBUFSIZE, IPC_NOWAIT) == -1) {
@@ -54,9 +57,7 @@ int main(int argc, char *argv[]) {
 			perror("msgsnd");
 			exit(1);
 		}
-
-		if (!infloop && i >= looplim)
-			break;
+		
 		i++;
 	}
 		
