@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <signal.h>
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -9,9 +10,33 @@
 #include "prime_common.h"
 #include "prime_calc.h"
 
+/* Only used by the signal handler */
+int msgid_global = -1;
+primenum_t n_global = 0;
+
+//Dealloc. the number
+void signal_handler(int signal) {
+	if (signal == SIGINT) {
+		printf("\nCtrl+C pressed. Cleaning up...\n");
+
+		if (n_global != 0) {
+			puts("Resetting...");
+			struct primemsgbuf cleanupmsg = { MTYP_REQ, CMD_SET_ONE, { n_global, EMPTY } };
+			if (msgsnd(msgid_global, (void *) &cleanupmsg, PBUFSIZE, IPC_NOWAIT) == -1) {
+				perror("msgsnd");
+				exit(1);
+			}
+		}
+		
+		exit(0); 
+	}
+}
+
 int main(int argc, char *argv[]) {
 	key_t key;
 	int msgid;
+
+	signal(SIGINT, signal_handler);
 
 	key = ftok(KEYPATH, PROJID);
 	msgid = msgget(key, IPC_CREAT | 0644);
@@ -45,6 +70,7 @@ int main(int argc, char *argv[]) {
 
 		primenum_t res = inmsg.args[0];
 		printf("GOT: %lld\n", res);
+		n_global = res; //For cleanup
 
 		//CALC
 		bool calc = is_prime(res);
@@ -58,6 +84,7 @@ int main(int argc, char *argv[]) {
 			exit(1);
 		}
 		
+		n_global = 0;
 		i++;
 	}
 		
