@@ -1,8 +1,17 @@
-ALL:
-	gcc test_set.c prime_files.c prime_calc.c -lm -o test_set.out
-	gcc test_read.c prime_files.c prime_calc.c -lm -o test_read.out
-	gcc prime_server.c prime_files.c -lm -o prime_server.out
-	gcc prime_c_checknum.c -lm -o prime_c_checknum.out
-	gcc prime_c_loop.c prime_calc.c -lm -o prime_c_loop.out
+CC = gcc
+CFLAGS = 
+LFLAGS = -lm
 
-#TODO: generalize the makefile
+all: prime_server.out prime_c_checknum.out prime_c_loop.out
+
+prime_server.out: prime_server.c prime_files.c
+	$(CC) $(CFLAGS) $^ $(LFLAGS) -o $@
+
+prime_c_checknum.out: prime_c_checknum.c
+	$(CC) $(CFLAGS) $^ $(LFLAGS) -o $@
+
+prime_c_loop.out: prime_c_loop.c prime_calc.c
+	$(CC) $(CFLAGS) $^ $(LFLAGS) -o $@
+
+clean:
+	rm -f prime_server.out prime_c_checknum.out prime_c_loop.out
