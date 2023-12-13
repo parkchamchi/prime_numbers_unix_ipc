@@ -105,6 +105,15 @@ void set_one(primenum_t target, enum Numstat stat) {
 
 	PRINTLOG("original c: %#x\n", c);
 
+	//RESET THE ENTRY!!!
+	char mask = 0x3; //0b11
+	mask <<= (3 - target % 4) * 2;
+	mask = ~mask; //On 2nd entry, 11 00 11 11
+	PRINTLOG("MASK: %#x\n", mask);
+	PRINTLOG("BEFORE: %#x\n", c);
+	c &= mask;
+	PRINTLOG("AFTER : %#x\n", c);
+
 	c |= (stat) << ((3 - target % 4) * 2); //Get the entry. The first one should be shifted by 3*2 bits to be placed in the first two bits.
 
 	PRINTLOG("new c: %#x\n", c);

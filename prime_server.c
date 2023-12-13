@@ -57,6 +57,7 @@ int main(void) {
 			puts("ALLOC_ONE");
 			outmsg.mtype = MTYP_RES_ALLOC_ONE;
 			outmsg.args[0] = alloc_one();
+			printf("sending: %lld\n", outmsg.args[0]);
 			should_reply = true;
 		
 			break; 
@@ -75,7 +76,6 @@ int main(void) {
 
 		//ret.
 		if (should_reply) {
-
 			if (msgsnd(msgid, (void *) &outmsg, PBUFSIZE, IPC_NOWAIT) == -1) {
 				perror("msgsnd");
 				exit(1);
