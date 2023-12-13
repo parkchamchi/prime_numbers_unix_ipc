@@ -8,12 +8,22 @@
 #include "prime_common.h"
 #include "prime_files.h"
 
+void signal_handler(int signal) {
+	if (signal == SIGINT) {
+		printf("\nCtrl+C pressed. Cleaning up...\n");
+		cleanup();
+		exit(0); 
+	}
+}
+
 int main(void) {
 	struct primemsgbuf inmsg = { 0 };
 	key_t key;
 	int msgid;
 
 	int len;
+
+	signal(SIGINT, signal_handler);
 
 	key = ftok(KEYPATH, PROJID);
 	if ((msgid = msgget(key, IPC_CREAT | 0644)) < 0) {
