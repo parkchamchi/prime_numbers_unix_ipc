@@ -10,9 +10,9 @@
 
 void signal_handler(int signal) {
 	if (signal == SIGINT) {
-    	printf("\nCtrl+C pressed. Cleaning up...\n");
-     	cleanup();
-    	exit(0); 
+		printf("\nCtrl+C pressed. Cleaning up...\n");
+		cleanup();
+		exit(0); 
 	}
 }
 
